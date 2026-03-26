@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Astrology Game</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: url('yourphoto.jpg') no-repeat center center/cover;
+  height: 100vh;
+  color: white;
+  overflow: hidden;
+}
+
+.overlay {
+  background: rgba(0,0,0,0.7);
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  text-align: center;
+  width: 340px;
+  animation: fadeIn 1s ease;
+}
+
+input {
+  width: 95%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 12px;
+  border: none;
+}
+
+button {
+  padding: 12px;
+  width: 100%;
+  background: linear-gradient(45deg,#ff4081,#ff80ab);
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#result {
+  margin-top: 15px;
+  font-size: 18px;
+  min-height: 50px;
+  white-space: pre-line;
+}
+
+.proposal {
+  display: none;
+  margin-top: 20px;
+}
+
+.proposal button {
+  width: 45%;
+  margin: 5px;
+}
+
+.heart {
+  position: absolute;
+  color: red;
+  font-size: 20px;
+  animation: float 2s linear forwards;
+}
+
+@keyframes float {
+  from {transform: translateY(0); opacity:1;}
+  to {transform: translateY(-200px); opacity:0;}
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform: translateY(20px);} 
+  to {opacity:1; transform: translateY(0);} 
+}
+</style>
+</head>
+
+<body>
+<div class="overlay">
+  <div class="container">
+    <h2>💖 Love Astrology 💖</h2>
+
+    <input type="text" id="yourName" placeholder="Your Name">
+    <input type="date" id="yourDOB">
+
+    <input type="text" id="partnerName" placeholder="Partner Name">
+    <input type="date" id="partnerDOB">
+
+    <button onclick="calculateLove()">Check Love</button>
+
+    <div id="result"></div>
+
+    <div class="proposal" id="proposalBox">
+      <h3>💍 Will You Marry Me?</h3>
+      <button onclick="answerYes()">YES ❤️</button>
+      <button id="noBtn" onmouseover="moveNo()">NO 😜</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function getZodiac(date) {
+  let d = new Date(date);
+  let day = d.getDate();
+  let month = d.getMonth() + 1;
+
+  if((month==3 && day>=21)||(month==4 && day<=19)) return "Aries";
+  if((month==4 && day>=20)||(month==5 && day<=20)) return "Taurus";
+  if((month==5 && day>=21)||(month==6 && day<=20)) return "Gemini";
+  if((month==6 && day>=21)||(month==7 && day<=22)) return "Cancer";
+  if((month==7 && day>=23)||(month==8 && day<=22)) return "Leo";
+  if((month==8 && day>=23)||(month==9 && day<=22)) return "Virgo";
+  if((month==9 && day>=23)||(month==10 && day<=22)) return "Libra";
+  if((month==10 && day>=23)||(month==11 && day<=21)) return "Scorpio";
+  if((month==11 && day>=22)||(month==12 && day<=21)) return "Sagittarius";
+  if((month==12 && day>=22)||(month==1 && day<=19)) return "Capricorn";
+  if((month==1 && day>=20)||(month==2 && day<=18)) return "Aquarius";
+  return "Pisces";
+}
+
+function typeText(text) {
+  let i = 0;
+  let speed = 40;
+  let resultDiv = document.getElementById("result");
+  resultDiv.innerHTML = "";
+
+  function typing() {
+    if (i < text.length) {
+      resultDiv.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+function calculateLove() {
+  let name1 = document.getElementById("yourName").value;
+  let name2 = document.getElementById("partnerName").value;
+  let dob1 = document.getElementById("yourDOB").value;
+  let dob2 = document.getElementById("partnerDOB").value;
+
+  if(!name1 || !name2 || !dob1 || !dob2) {
+    document.getElementById("result").innerHTML = "⚠️ Fill all details";
+    return;
+  }
+
+  let zodiac1 = getZodiac(dob1);
+  let zodiac2 = getZodiac(dob2);
+  let lovePercent = Math.floor(Math.random()*100)+1;
+
+  let message = `✨ ${zodiac1} ❤️ ${zodiac2}\n💘 Love: ${lovePercent}%`;
+  typeText(message);
+
+  document.getElementById("proposalBox").style.display = "block";
+}
+
+function createHearts() {
+  for(let i=0;i<20;i++){
+    let heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤️";
+    heart.style.left = Math.random()*100 + "%";
+    heart.style.top = "80%";
+    document.body.appendChild(heart);
+
+    setTimeout(()=>{ heart.remove(); },2000);
+  }
+}
+
+function answerYes() {
+  let yourName = document.getElementById("yourName").value;
+  let partnerName = document.getElementById("partnerName").value;
+
+  if(!yourName || !partnerName){
+    alert("Enter names first ❤️");
+    return;
+  }
+
+  let finalMessage = `💍 ${yourName} proposed to ${partnerName}! ❤️\n🎉 ${partnerName} accepted! 💖`;
+
+  // Save history
+  let history = JSON.parse(localStorage.getItem("loveHistory") || "[]");
+  history.push(finalMessage);
+  localStorage.setItem("loveHistory", JSON.stringify(history));
+
+  // Show typing result
+  typeText(finalMessage);
+
+  // Heart animation
+  createHearts();
+
+  // WhatsApp share after delay
+  setTimeout(() => {
+    let url = "https://wa.me/?text=" + encodeURIComponent(finalMessage);
+    window.open(url, '_blank');
+  }, 1500);
+}
+
+function moveNo() {
+  let btn = document.getElementById("noBtn");
+  btn.style.position = "absolute";
+  btn.style.top = Math.random()*300 + "px";
+  btn.style.left = Math.random()*300 + "px";
+}
+</script>
+
+</body>
+</html>
